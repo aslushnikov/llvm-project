@@ -113,6 +113,10 @@ add_clang_library(clangDaemon
   index/SymbolID.cpp
   index/SymbolLocation.cpp
   index/SymbolOrigin.cpp
+
+  index/sqlite/sqlite3.c
+  index/sqlite/SQLITESerialization.cpp
+
   index/YAMLSerialization.cpp
 
   index/dex/Dex.cpp

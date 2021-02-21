@@ -33,7 +33,9 @@ static llvm::cl::opt<IndexFileFormat>
            llvm::cl::values(clEnumValN(IndexFileFormat::YAML, "yaml",
                                        "human-readable YAML format"),
                             clEnumValN(IndexFileFormat::RIFF, "binary",
-                                       "binary RIFF format")),
+                                       "binary RIFF format"),
+                            clEnumValN(IndexFileFormat::SQLITE, "sqlite",
+                                       "sqlite KodSearch format")),
            llvm::cl::init(IndexFileFormat::RIFF));
 
 class IndexActionFactory : public tooling::FrontendActionFactory {

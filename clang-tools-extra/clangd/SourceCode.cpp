@@ -230,6 +230,14 @@ Position sourceLocToPosition(const SourceManager &SM, SourceLocation Loc) {
   return P;
 }
 
+unsigned sourceLocToOffset(const SourceManager &SM, SourceLocation Loc) {
+  // We use the SourceManager's line tables, but its column number is in bytes.
+  FileID FID;
+  unsigned Offset;
+  std::tie(FID, Offset) = SM.getDecomposedSpellingLoc(Loc);
+  return Offset;
+}
+
 bool isSpelledInSource(SourceLocation Loc, const SourceManager &SM) {
   if (Loc.isMacroID()) {
     std::string PrintLoc = SM.getSpellingLoc(Loc).printToString(SM);

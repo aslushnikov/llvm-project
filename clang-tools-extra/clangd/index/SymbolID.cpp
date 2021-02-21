@@ -24,6 +24,15 @@ llvm::StringRef SymbolID::raw() const {
                          RawSize);
 }
 
+unsigned long long SymbolID::number() const {
+  // We already have a good hash, just return the first bytes.
+  static_assert(sizeof(unsigned long long) >= SymbolID::RawSize,
+                "unsigned long long is smaller than SHA1!");
+  unsigned long long Result;
+  memcpy(&Result, HashValue.data(), sizeof(unsigned long long));
+  return Result;
+}
+
 SymbolID SymbolID::fromRaw(llvm::StringRef Raw) {
   SymbolID ID;
   assert(Raw.size() == RawSize);

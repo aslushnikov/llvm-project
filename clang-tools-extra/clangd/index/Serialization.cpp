@@ -670,6 +670,8 @@ void writeRIFF(const IndexFileOut &Data, llvm::raw_ostream &OS) {
 
 // Defined in YAMLSerialization.cpp.
 void writeYAML(const IndexFileOut &, llvm::raw_ostream &);
+// Defined in sqlite/SQLITESerialization.cpp.
+void writeSQLITE(const IndexFileOut &, llvm::raw_ostream &);
 llvm::Expected<IndexFileIn> readYAML(llvm::StringRef);
 
 llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const IndexFileOut &O) {
@@ -679,6 +681,9 @@ llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const IndexFileOut &O) {
     break;
   case IndexFileFormat::YAML:
     writeYAML(O, OS);
+    break;
+  case IndexFileFormat::SQLITE:
+    writeSQLITE(O, OS);
     break;
   }
   return OS;

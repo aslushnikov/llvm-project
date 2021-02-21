@@ -36,6 +36,7 @@ namespace clangd {
 enum class IndexFileFormat {
   RIFF, // Versioned binary format, suitable for production use.
   YAML, // Human-readable format, suitable for experiments and debugging.
+  SQLITE, // Kodsearch-specific format, suitable for kodsearch only.
 };
 
 // Holds the contents of an index file that was read.
