@@ -90,6 +90,8 @@ public:
     /// This does not currently affect macros (many like _WIN32 are important!)
     /// This only affects system headers.
     bool CollectReserved = false;
+    /// Collect function local symbols.
+    bool CollectFunctionLocalSymbols = false;
     /// If set to true, SymbolCollector will collect doc for all symbols.
     /// Note that documents of symbols being indexed for completion will always
     /// be collected regardless of this option.

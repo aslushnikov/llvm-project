@@ -35,7 +35,9 @@ static llvm::cl::opt<IndexFileFormat>
            llvm::cl::values(clEnumValN(IndexFileFormat::YAML, "yaml",
                                        "human-readable YAML format"),
                             clEnumValN(IndexFileFormat::RIFF, "binary",
-                                       "binary RIFF format")),
+                                       "binary RIFF format"),
+                            clEnumValN(IndexFileFormat::SQLITE, "sqlite",
+                                       "sqlite KodSearch format")),
            llvm::cl::init(IndexFileFormat::RIFF));
 
 class IndexActionFactory : public tooling::FrontendActionFactory {
@@ -45,6 +47,12 @@ public:
   std::unique_ptr<FrontendAction> create() override {
     SymbolCollector::Options Opts;
     Opts.CountReferences = true;
+    Opts.RefFilter = RefKind::All;
+    Opts.RefsInHeaders = true;
+    Opts.CollectMacro = false;
+    Opts.CollectMainFileSymbols = true;
+    Opts.CollectMainFileRefs = true;
+    Opts.CollectFunctionLocalSymbols = true;
     Opts.FileFilter = [&](const SourceManager &SM, FileID FID) {
       const auto F = SM.getFileEntryRefForID(FID);
       if (!F)

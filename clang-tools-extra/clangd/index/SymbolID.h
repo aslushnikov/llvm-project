@@ -48,6 +48,7 @@ public:
   // This trades off memory against the number of symbols we can handle.
   constexpr static size_t RawSize = 8;
   llvm::StringRef raw() const;
+  unsigned long long number() const;
   static SymbolID fromRaw(llvm::StringRef);
 
   // Returns a hex encoded string.

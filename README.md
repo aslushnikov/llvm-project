@@ -1,39 +1,56 @@
-# The LLVM Compiler Infrastructure
+# KodSearch branch
 
-Welcome to the LLVM project!
+### Compilation Instructions
 
-This repository contains the source code for LLVM, a toolkit for the
-construction of highly optimized compilers, optimizers, and run-time
-environments.
+```sh
+$ git clone --single-branch --branch kodsearch-new https://github.com/aslushnikov/llvm-project
+$ cd llvm-project
+$ mkdir build
+$ cd build
+$ cmake -G Ninja -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;' -DCMAKE_BUILD_TYPE=Release ../llvm/
+$ cmake --build .
+```
 
-The LLVM project has multiple components. The core of the project is
-itself called "LLVM". This contains all of the tools, libraries, and header
-files needed to process intermediate representations and convert them into
-object files. Tools include an assembler, disassembler, bitcode analyzer, and
-bitcode optimizer.
+This will yield a `./bin/clangd-indexer` file that has a custom `--format=sqlite` option.
 
-C-like languages use the [Clang](http://clang.llvm.org/) frontend. This
-component compiles C, C++, Objective-C, and Objective-C++ code into LLVM bitcode
--- and from there into object files, using LLVM.
+### Running
 
-Other components include:
-the [libc++ C++ standard library](https://libcxx.llvm.org),
-the [LLD linker](https://lld.llvm.org), and more.
+To run indexer:
 
-## Getting the Source Code and Building LLVM
+```sh
+$ ./bin/clangd-indexer path-to-compile-commands-json --executor=all-TUs --format=sqlite --execute-concurrency=0
+```
 
-Consult the
-[Getting Started with LLVM](https://llvm.org/docs/GettingStarted.html#getting-the-source-code-and-building-llvm)
-page for information on building and running LLVM.
+The indexer produces a `db.sqlite` in `$PWD` which is an `sqlite3` database.
 
-For information on how to contribute to the LLVM project, please take a look at
-the [Contributing to LLVM](https://llvm.org/docs/Contributing.html) guide.
+### SQLite Index Format
 
-## Getting in touch
+The `db.sqlite` database has the following tables:
 
-Join the [LLVM Discourse forums](https://discourse.llvm.org/), [Discord
-chat](https://discord.gg/xS7Z362), or #llvm IRC channel on
-[OFTC](https://oftc.net/).
+1. table `PATHS` - list of all indexed paths.
+    * column `pathid`: number
+    * column `path`: text, an absolute file URL.
+2. table `SYMBOLS` - list of all indexed symbols.
+    * column `usr`: number - symbol ID. Historically called `USR` since that's what it is in clang-world.
+    * column `type`: number.
+        * `1` - symbol is a reference
+        * `2` - symbol is a definition
+        * `3` - symbol is a declaration
+    * column `loc1`: number - packed 4-byte location with top 20 bits - line number and bottom 12 bits - column number.
+    * column `loc2`: number - packed 4-byte location with top 20 bits - line number and bottom 12 bits - column number.
+    * column `pathid`: number - id of file path
+3. table `RELATIONS` - list of all relations between symbols
+    * column `subject_usr`: number - subject symbol ID
+    * column `object_usr`: number - object symbol ID
+    * column `predicate`: number
+        * `1` - `subject_usr` "is base of " `object_usr`
+        * `2` - `subject_usr` "is overriden by" `object_usr`
 
-The LLVM project has adopted a [code of conduct](https://llvm.org/docs/CodeOfConduct.html) for
-participants to all modes of communication within the project.
+> **NOTE** Symbols in the database might overlap with each other.
+
+### Known Issues
+
+(Using webkit-gtk search as an example)
+
+- [ ] Multiple USR's are expanded into a single macro; e.g. [`RELEASE_LOG_IF_ALLOWED`](http://powerhouse:3000/#path=%2Fhome%2Faslushnikov%2Fprog%2Fplaywright%2Fbrowser_patches%2Fwebkit%2Fcheckout%2FSource%2FWebKit%2FNetworkProcess%2FNetworkLoadChecker.cpp&line=445)
+>>>>>>> d20c78a8342c (wip: configure as we would like)
