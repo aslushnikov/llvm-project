@@ -43,6 +43,12 @@ public:
   std::unique_ptr<FrontendAction> create() override {
     SymbolCollector::Options Opts;
     Opts.CountReferences = true;
+    Opts.RefFilter = RefKind::All;
+    Opts.RefsInHeaders = true;
+    Opts.CollectMacro = true;
+    Opts.CollectMainFileSymbols = true;
+    Opts.CollectMainFileRefs = true;
+    Opts.CollectFunctionLocalSymbols = true;
     Opts.FileFilter = [&](const SourceManager &SM, FileID FID) {
       const auto *F = SM.getFileEntryForID(FID);
       if (!F)

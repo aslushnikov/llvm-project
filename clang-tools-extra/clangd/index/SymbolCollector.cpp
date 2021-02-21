@@ -225,7 +225,7 @@ bool SymbolCollector::shouldCollectSymbol(const NamedDecl &ND,
 
   // For function local symbols, index only classes and its member functions.
   if (index::isFunctionLocalSymbol(&ND))
-    return isa<RecordDecl>(ND) ||
+    return Opts.CollectFunctionLocalSymbols || isa<RecordDecl>(ND) ||
            (ND.isCXXInstanceMember() && ND.isFunctionOrFunctionTemplate());
 
   // We want most things but not "local" symbols such as symbols inside
