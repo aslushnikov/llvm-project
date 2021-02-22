@@ -172,7 +172,17 @@ void SQLite::persist(const clang::clangd::IndexFileOut& O) {
           fprintf(stderr, "Bind Error while binding record.offset2!\n- error: %s\n", sqlite3_errmsg(db_));
           continue;
         }
-        if (sqlite3_bind_int(insert_record_stmt_, 5, static_cast<uint8_t>(R.Kind)) != SQLITE_OK) {
+        uint8_t original_kind = static_cast<uint8_t>(R.Kind);
+        uint8_t kind = 0;
+        if (original_kind & RefKind::Declaration)
+          kind = 3;
+        else if (original_kind & RefKind::Definition)
+          kind = 2;
+        else if (original_kind & RefKind::Reference)
+          kind = 1;
+        else
+          continue;
+        if (sqlite3_bind_int(insert_record_stmt_, 5, kind) != SQLITE_OK) {
           fprintf(stderr, "Bind Error while binding record.type!\n- error: %s\n", sqlite3_errmsg(db_));
           continue;
         }
