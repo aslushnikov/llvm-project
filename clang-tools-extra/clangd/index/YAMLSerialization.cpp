@@ -50,6 +50,7 @@ struct VariantEntry {
 struct YPosition {
   uint32_t Line;
   uint32_t Column;
+  uint32_t Offset;
 };
 
 // avoid ODR violation of specialization for non-owned CompileCommand
@@ -124,6 +125,7 @@ template <> struct MappingTraits<YPosition> {
   static void mapping(IO &IO, YPosition &Value) {
     IO.mapRequired("Line", Value.Line);
     IO.mapRequired("Column", Value.Column);
+    IO.mapRequired("Offset", Value.Offset);
   }
 };
 
@@ -133,6 +135,7 @@ struct NormalizedPosition {
   NormalizedPosition(IO &, const Position &Pos) {
     P.Line = Pos.line();
     P.Column = Pos.column();
+    P.Offset = Pos.rep();
   }
 
   Position denormalize(IO &) {
