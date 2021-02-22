@@ -173,12 +173,12 @@ void SQLite::persist(const clang::clangd::IndexFileOut& O) {
           continue;
         }
         uint8_t original_kind = static_cast<uint8_t>(R.Kind);
-        uint8_t kind = 0;
-        if (original_kind & RefKind::Declaration)
+        int kind = 0;
+        if ((original_kind & static_cast<uint8_t>(clang::clangd::RefKind::Declaration)) > 0)
           kind = 3;
-        else if (original_kind & RefKind::Definition)
+        else if ((original_kind & static_cast<uint8_t>(clang::clangd::RefKind::Definition)) > 0)
           kind = 2;
-        else if (original_kind & RefKind::Reference)
+        else if ((original_kind & static_cast<uint8_t>(clang::clangd::RefKind::Reference)) > 0)
           kind = 1;
         else
           continue;

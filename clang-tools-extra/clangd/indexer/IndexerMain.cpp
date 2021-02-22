@@ -47,7 +47,7 @@ public:
     Opts.CountReferences = true;
     Opts.RefFilter = RefKind::All;
     Opts.RefsInHeaders = true;
-    Opts.CollectMacro = true;
+    Opts.CollectMacro = false;
     Opts.CollectMainFileSymbols = true;
     Opts.CollectMainFileRefs = true;
     Opts.CollectFunctionLocalSymbols = true;
