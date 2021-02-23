@@ -47,3 +47,10 @@ The `db.sqlite` database has the following tables:
         * `2` - `subject_usr` "is overriden by" `object_usr`
 
 > **NOTE** Symbols in the database might overlap with each other.
+
+### Known Issues
+
+(Using webkit-gtk search as an example)
+
+- [ ] Multiple USR's are expanded into a single macro; e.g. [`RELEASE_LOG_IF_ALLOWED`](http://powerhouse:3000/#path=%2Fhome%2Faslushnikov%2Fprog%2Fplaywright%2Fbrowser_patches%2Fwebkit%2Fcheckout%2FSource%2FWebKit%2FNetworkProcess%2FNetworkLoadChecker.cpp&line=445)
+- [ ] Enums with deep namespace nesting aren't indexed, e.g. [`FetchOptions::Mode::NoCors`](http://powerhouse:3000/#path=%2Fhome%2Faslushnikov%2Fprog%2Fplaywright%2Fbrowser_patches%2Fwebkit%2Fcheckout%2FSource%2FWebKit%2FNetworkProcess%2FNetworkLoadChecker.cpp&line=464)
