@@ -27,7 +27,7 @@ class SQLite {
   sqlite3 *db_ = nullptr;
   sqlite3_stmt* insert_file_stmt_ = nullptr;
   sqlite3_stmt* insert_record_stmt_ = nullptr;
-  sqlite3_stmt* insert_override_stmt_ = nullptr;
+  sqlite3_stmt* insert_relation_stmt_ = nullptr;
 };
 
 static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
@@ -66,10 +66,10 @@ std::unique_ptr<SQLite> SQLite::create(std::string filepath) {
     return nullptr;
   }
   if (!result->execute(
-        "CREATE TABLE OVERRIDES("
-        "  usr        INT         NOT NULL,"
-        "  pathid     INT         NOT NULL,"
-        "  offset     INT         NOT NULL);"
+        "CREATE TABLE RELATIONS("
+        "  subject_usr    INT         NOT NULL,"
+        "  predicate      INT         NOT NULL,"
+        "  object_usr     INT         NOT NULL);"
       )) {
     return nullptr;
   }
@@ -80,7 +80,12 @@ std::unique_ptr<SQLite> SQLite::create(std::string filepath) {
     return nullptr;
   }
   if (!result->execute(
-        "CREATE INDEX idx_overrides_usr on OVERRIDES(pathid);"
+        "CREATE INDEX idx_relations_subject_usr on RELATIONS(subject_usr);"
+      )) {
+    return nullptr;
+  }
+  if (!result->execute(
+        "CREATE INDEX idx_relations_object_usr on RELATIONS(object_usr);"
       )) {
     return nullptr;
   }
@@ -101,8 +106,8 @@ std::unique_ptr<SQLite> SQLite::create(std::string filepath) {
     return nullptr;
   }
 
-  const char* insert_override_sql = "INSERT INTO OVERRIDES (USR, PATHID, OFFSET) VALUES (?, ?, ?);";
-  if (sqlite3_prepare_v2(result->db_, insert_override_sql, -1, &result->insert_override_stmt_, NULL) != SQLITE_OK) {
+  const char* insert_relation_sql = "INSERT INTO RELATIONS (SUBJECT_USR, PREDICATE, OBJECT_USR) VALUES (?, ?, ?);";
+  if (sqlite3_prepare_v2(result->db_, insert_relation_sql, -1, &result->insert_relation_stmt_, NULL) != SQLITE_OK) {
     fprintf(stderr, "Prepare error: %s\n", sqlite3_errmsg(result->db_));
     return nullptr;
   }
@@ -193,29 +198,38 @@ void SQLite::persist(const clang::clangd::IndexFileOut& O) {
       }
     }
   }
- /*
-
-
-  for (auto& record : tu_result.overrides) {
-    sqlite3_reset(insert_override_stmt_);
-    if (sqlite3_bind_int(insert_override_stmt_, 1, record.usr) != SQLITE_OK) {
-      fprintf(stderr, "Bind Error while binding overriderecord.usr!\n- error: %s\n", sqlite3_errmsg(db_));
-      continue;
-    }
-    if (sqlite3_bind_int(insert_override_stmt_, 2, record.pathid) != SQLITE_OK) {
-      fprintf(stderr, "Bind Error while binding overriderecord.pathid!\n- error: %s\n", sqlite3_errmsg(db_));
-      continue;
-    }
-    if (sqlite3_bind_int(insert_override_stmt_, 3, record.offset) != SQLITE_OK) {
-      fprintf(stderr, "Bind Error while binding overriderecord.offset!\n- error: %s\n", sqlite3_errmsg(db_));
-      continue;
-    }
-    if (sqlite3_step(insert_override_stmt_) != SQLITE_DONE) {
-      fprintf(stderr, "Step Error white inserting record!\n- error: %s\n", sqlite3_errmsg(db_));
-      continue;
+  if (O.Relations) {
+    for (auto &R : *O.Relations) {
+      unsigned long long subj_id = R.Subject.number();
+      unsigned long long obj_id = R.Object.number();
+      uint8_t kind = 0;
+      if (R.Predicate == clang::clangd::RelationKind::BaseOf) {
+        kind = 1;
+      } else if (R.Predicate == clang::clangd::RelationKind::OverriddenBy) {
+        kind = 2;
+      } else {
+        fprintf(stderr, "WARN: new relationship kind is available!");
+        continue;
+      }
+      sqlite3_reset(insert_relation_stmt_);
+      if (sqlite3_bind_int(insert_relation_stmt_, 1, subj_id) != SQLITE_OK) {
+        fprintf(stderr, "Bind Error while binding relation subject_usr!\n- error: %s\n", sqlite3_errmsg(db_));
+        continue;
+      }
+      if (sqlite3_bind_int(insert_relation_stmt_, 2, kind) != SQLITE_OK) {
+        fprintf(stderr, "Bind Error while binding relation kind!\n- error: %s\n", sqlite3_errmsg(db_));
+        continue;
+      }
+      if (sqlite3_bind_int(insert_relation_stmt_, 3, obj_id) != SQLITE_OK) {
+        fprintf(stderr, "Bind Error while binding relation object_usr!\n- error: %s\n", sqlite3_errmsg(db_));
+        continue;
+      }
+      if (sqlite3_step(insert_relation_stmt_) != SQLITE_DONE) {
+        fprintf(stderr, "Step Error white inserting record!\n- error: %s\n", sqlite3_errmsg(db_));
+        continue;
+      }
     }
   }
-  */
 
   sqlite3_exec(db_, "END TRANSACTION;", NULL, NULL, NULL);
 }
