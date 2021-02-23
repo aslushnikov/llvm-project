@@ -90,7 +90,7 @@ std::unique_ptr<SQLite> SQLite::create(std::string filepath) {
     return nullptr;
   }
   if (!result->execute(
-        "CREATE INDEX idx_symbols_usr on SYMBOLS(usr);"
+        "CREATE INDEX idx_symbols_usr on SYMBOLS(usr, type);"
       )) {
     return nullptr;
   }
