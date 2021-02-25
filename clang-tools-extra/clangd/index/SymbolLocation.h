@@ -34,7 +34,6 @@ struct SymbolLocation {
     void setLine(uint32_t Line);
     uint32_t line() const { return LineColumnPacked >> ColumnBits; }
     void setColumn(uint32_t Column);
-    void setOffset(uint32_t Offset) { LineColumnPacked = Offset; }
     uint32_t column() const { return LineColumnPacked & MaxColumn; }
     uint32_t rep() const { return LineColumnPacked; }
 

@@ -70,10 +70,6 @@ Position offsetToPosition(llvm::StringRef Code, size_t Offset);
 /// FIXME: This should return an error if the location is invalid.
 Position sourceLocToPosition(const SourceManager &SM, SourceLocation Loc);
 
-/// Turn a SourceLocation into an offset
-/// FIXME: This should return an error if the location is invalid.
-unsigned sourceLocToOffset(const SourceManager &SM, SourceLocation Loc);
-
 /// Return the file location, corresponding to \p P. Note that one should take
 /// care to avoid comparing the result with expansion locations.
 llvm::Expected<SourceLocation> sourceLocationInMainFile(const SourceManager &SM,

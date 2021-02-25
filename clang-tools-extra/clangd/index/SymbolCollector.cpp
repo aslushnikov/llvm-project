@@ -127,9 +127,10 @@ std::pair<SymbolLocation::Position, SymbolLocation::Position>
 getTokenRange(SourceLocation TokLoc, const SourceManager &SM,
               const LangOptions &LangOpts) {
   auto CreatePosition = [&SM](SourceLocation Loc) {
-    unsigned offset = sourceLocToOffset(SM, Loc);
+    auto LSPLoc = sourceLocToPosition(SM, Loc);
     SymbolLocation::Position Pos;
-    Pos.setOffset(offset);
+    Pos.setLine(LSPLoc.line);
+    Pos.setColumn(LSPLoc.character);
     return Pos;
   };
 
