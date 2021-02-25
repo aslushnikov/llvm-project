@@ -59,8 +59,8 @@ std::unique_ptr<SQLite> SQLite::create(std::string filepath) {
         "CREATE TABLE SYMBOLS("
         "  pathid     INT         NOT NULL,"
         "  usr        INT         NOT NULL,"
-        "  offset1    INT         NOT NULL,"
-        "  offset2    INT         NOT NULL,"
+        "  loc1       INT         NOT NULL,"
+        "  loc2       INT         NOT NULL,"
         "  type       INT         NOT NULL);"
       )) {
     return nullptr;
@@ -112,7 +112,7 @@ std::unique_ptr<SQLite> SQLite::create(std::string filepath) {
     return nullptr;
   }
 
-  const char* insert_symbol_sql = "INSERT INTO SYMBOLS (PATHID, USR, OFFSET1, OFFSET2, TYPE) VALUES (?, ?, ?, ?, ?);";
+  const char* insert_symbol_sql = "INSERT INTO SYMBOLS (PATHID, USR, LOC1, LOC2, TYPE) VALUES (?, ?, ?, ?, ?);";
   if (sqlite3_prepare_v2(result->db_, insert_symbol_sql, -1, &result->insert_record_stmt_, NULL) != SQLITE_OK) {
     fprintf(stderr, "Prepare error: %s\n", sqlite3_errmsg(result->db_));
     return nullptr;
@@ -170,11 +170,11 @@ void SQLite::persist(const clang::clangd::IndexFileOut& O) {
           continue;
         }
         if (sqlite3_bind_int(insert_record_stmt_, 3, R.Location.Start.rep()) != SQLITE_OK) {
-          fprintf(stderr, "Bind Error while binding record.offset1!\n- error: %s\n", sqlite3_errmsg(db_));
+          fprintf(stderr, "Bind Error while binding record.loc1!\n- error: %s\n", sqlite3_errmsg(db_));
           continue;
         }
         if (sqlite3_bind_int(insert_record_stmt_, 4, R.Location.End.rep()) != SQLITE_OK) {
-          fprintf(stderr, "Bind Error while binding record.offset2!\n- error: %s\n", sqlite3_errmsg(db_));
+          fprintf(stderr, "Bind Error while binding record.loc2!\n- error: %s\n", sqlite3_errmsg(db_));
           continue;
         }
         uint8_t original_kind = static_cast<uint8_t>(R.Kind);

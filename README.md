@@ -36,8 +36,8 @@ The `db.sqlite` database has the following tables:
         * `1` - symbol is a reference
         * `2` - symbol is a definition
         * `3` - symbol is a declaration
-    * column `offset1`: number - start offset in file, 0-based
-    * column `offset2`: number - end offset in file, 0-based
+    * column `loc1`: number - packed 4-byte location with top 20 bits - line number and bottom 12 bits - column number.
+    * column `loc2`: number - packed 4-byte location with top 20 bits - line number and bottom 12 bits - column number.
     * column `pathid`: number - id of file path
 3. table `RELATIONS` - list of all relations between symbols
     * column `subject_usr`: number - subject symbol ID
