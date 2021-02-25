@@ -3,8 +3,8 @@
 #include "../Serialization.h"
 #include "../SymbolLocation.h"
 #include "../SymbolOrigin.h"
+#include "./sqlite3.h"
 #include <cstdint>
-#include <sqlite3.h>
 
 namespace{
 
