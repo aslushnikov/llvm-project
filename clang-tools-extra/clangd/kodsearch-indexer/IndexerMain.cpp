@@ -124,6 +124,10 @@ int main(int argc, const char **argv) {
   llvm::sys::PrintStackTraceOnErrorSignal(argv[0]);
 
   auto OptionsParser = clang::tooling::CommonOptionsParser::create(argc, argv, clang::clangd::KodSearchClangCategory);
+  if (!OptionsParser) {
+    llvm::errs() << OptionsParser.takeError();
+    exit(1);
+  }
 
   auto& compilations = OptionsParser->getCompilations();
   if (compilations.getAllFiles().size() == 0) {
