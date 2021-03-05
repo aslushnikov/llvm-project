@@ -171,6 +171,7 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 endif()
 add_subdirectory(tool)
 add_subdirectory(indexer)
+add_subdirectory(kodsearch-indexer)
 
 if (LLVM_INCLUDE_BENCHMARKS)
   add_subdirectory(benchmarks)
